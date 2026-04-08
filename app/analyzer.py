@@ -5,9 +5,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+def get_client() -> Groq:
+    """Retorna um cliente Groq autenticado."""
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def analyze_repo(repo_data: dict) -> dict:
+    """Analisa um repositório GitHub usando IA e retorna um relatório estruturado."""
+    client = get_client()
+
     files_text = ""
     for file in repo_data["files"]:
         files_text += f"\n\n--- {file['path']} ---\n{file['content']}"
