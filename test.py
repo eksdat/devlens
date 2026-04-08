@@ -1,7 +1,8 @@
 from app.github import extract_repo_info
+from app.analyzer import analyze_repo
+import json
 
-resultado = extract_repo_info("https://github.com/torvalds/linux")
+repo_data = extract_repo_info("https://github.com/eksdat/mlp-neural-network")
+analise = analyze_repo(repo_data)
 
-for arquivo in resultado["files"]:
-    print(f"\n--- {arquivo['path']} ---")
-    print(arquivo["content"][:200])
+print(json.dumps(analise, indent=2, ensure_ascii=False))
