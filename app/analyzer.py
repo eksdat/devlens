@@ -1,11 +1,11 @@
-from google import genai
+from groq import Groq
 import os
 import json
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def analyze_repo(repo_data: dict) -> dict:
     files_text = ""
@@ -29,12 +29,13 @@ Analise este repositório e responda APENAS em JSON válido, sem texto fora do J
   "resumo_executivo": "vale a pena contribuir ou usar este projeto?"
 }}"""
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
     )
 
-    clean = response.text.strip()
+    clean = response.choices[0].message.content.strip()
     if clean.startswith("```"):
         clean = clean.split("```")[1]
         if clean.startswith("json"):
