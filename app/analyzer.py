@@ -2,6 +2,7 @@ from groq import Groq
 import os
 import json
 from dotenv import load_dotenv
+from app.metrics import run_metrics
 
 load_dotenv()
 
@@ -10,8 +11,11 @@ def get_client() -> Groq:
     return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def analyze_repo(repo_data: dict) -> dict:
-    """Analisa um repositório GitHub usando IA e retorna um relatório estruturado."""
+    """Analisa um repositório GitHub usando métricas reais + IA."""
     client = get_client()
+
+    # Métricas reais primeiro
+    metrics = run_metrics(repo_data)
 
     files_text = ""
     for file in repo_data["files"]:
@@ -21,17 +25,27 @@ def analyze_repo(repo_data: dict) -> dict:
 
 Repositório: {repo_data['owner']}/{repo_data['repo']}
 
-Arquivos encontrados:
+=== MÉTRICAS REAIS DO CÓDIGO ===
+Complexidade ciclomática média: {metrics['complexity']['average']} (risco: {metrics['complexity']['risk']})
+Total de linhas de código: {metrics['raw']['total_lines_of_code']}
+Ratio de comentários: {metrics['raw']['comment_ratio']}%
+Índice de manutenibilidade: {metrics['maintainability']['index']}/100 (grau {metrics['maintainability']['grade']})
+Tem testes: {metrics['tests']['has_tests']} ({metrics['tests']['test_ratio']}% dos arquivos são testes)
+Tem README: {metrics['documentation']['has_readme']}
+Arquivos de dependência: {metrics['dependencies']['found']}
+
+=== CÓDIGO DO REPOSITÓRIO ===
 {files_text}
 
-Analise este repositório e responda APENAS em JSON válido, sem texto fora do JSON, neste formato exato:
+Com base nas métricas reais acima e no código, analise este repositório.
+Responda APENAS em JSON válido, sem texto fora do JSON:
 {{
   "proposito": "descrição clara do que o projeto faz",
-  "qualidade": "avaliação da qualidade do código",
-  "pontos_cegos": ["ponto 1", "ponto 2", "ponto 3"],
+  "qualidade": "avaliação detalhada baseada nas métricas reais",
+  "pontos_cegos": ["ponto específico baseado nas métricas", "ponto 2", "ponto 3"],
   "nota": 7,
-  "sugestoes": ["sugestão 1", "sugestão 2", "sugestão 3"],
-  "resumo_executivo": "vale a pena contribuir ou usar este projeto?"
+  "sugestoes": ["sugestão concreta e específica", "sugestão 2", "sugestão 3"],
+  "resumo_executivo": "análise honesta baseada em dados reais"
 }}"""
 
     response = client.chat.completions.create(
@@ -47,4 +61,7 @@ Analise este repositório e responda APENAS em JSON válido, sem texto fora do J
             clean = clean[4:]
     clean = clean.strip()
 
-    return json.loads(clean)
+    analysis = json.loads(clean)
+    analysis["metrics"] = metrics
+
+    return analysis
