@@ -53,9 +53,7 @@
       transition: border-color 0.2s;
     }
 
-    .search-box input:focus {
-      border-color: #58a6ff;
-    }
+    .search-box input:focus { border-color: #58a6ff; }
 
     .search-box button {
       padding: 14px 24px;
@@ -131,6 +129,35 @@
     }
 
     .card p { color: #e6edf3; line-height: 1.6; }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .metric-item {
+      background: #21262d;
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
 
     .tag-list { display: flex; flex-direction: column; gap: 8px; }
 
@@ -210,6 +237,12 @@
         const a = data.analysis;
         const nota = a.nota;
         const cor = nota >= 8 ? '#3fb950' : nota >= 6 ? '#d29922' : '#f85149';
+        const m = a.metrics;
+
+        const miColor = m.maintainability.grade === 'A' ? '#3fb950' :
+                        m.maintainability.grade === 'B' ? '#d29922' : '#f85149';
+        const complexColor = m.complexity.risk === 'low' ? '#3fb950' :
+                             m.complexity.risk === 'medium' ? '#d29922' : '#f85149';
 
         result.innerHTML = `
           <div class="repo-title">
@@ -217,6 +250,42 @@
             <span class="nota-badge" style="background:${cor}22; color:${cor}">
               ${nota}/10
             </span>
+          </div>
+
+          <div class="card">
+            <h3>📊 Métricas Reais do Código</h3>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">Linhas de código</span>
+                <span class="metric-value">${m.raw.total_lines_of_code}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Complexidade</span>
+                <span class="metric-value" style="color:${complexColor}">
+                  ${m.complexity.average} (${m.complexity.risk})
+                </span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Manutenibilidade</span>
+                <span class="metric-value" style="color:${miColor}">
+                  Grau ${m.maintainability.grade} (${m.maintainability.index}/100)
+                </span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Comentários</span>
+                <span class="metric-value">${m.raw.comment_ratio}%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Testes</span>
+                <span class="metric-value" style="color:${m.tests.has_tests ? '#3fb950' : '#f85149'}">
+                  ${m.tests.has_tests ? '✅ ' + m.tests.test_ratio + '%' : '❌ Nenhum'}
+                </span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">README</span>
+                <span class="metric-value">${m.documentation.has_readme ? '✅' : '❌'}</span>
+              </div>
+            </div>
           </div>
 
           <div class="card">
