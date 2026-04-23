@@ -69,4 +69,53 @@ Responda APENAS em JSON valido, sem texto fora do JSON:
 
     analysis = json.loads(clean)
     analysis["metrics"] = metrics
+    analysis["architecture"] = generate_architecture(repo_data, client)
     return analysis
+
+
+def generate_architecture(repo_data: dict, client) -> dict:
+    files_text = ""
+    for file in repo_data["files"]:
+        files_text += f"\n\n--- {file['path']} ---\n{file['content']}"
+
+    prompt = f"""Voce e um arquiteto de software analisando o repositorio {repo_data['owner']}/{repo_data['repo']}.
+
+=== ARQUIVOS DO PROJETO ===
+{files_text}
+
+Analise a arquitetura deste projeto e responda APENAS em JSON valido, sem texto fora do JSON:
+{{
+  "visao_geral": "descricao de como o projeto esta organizado em 2-3 frases",
+  "modulos": [
+    {{
+      "arquivo": "nome do arquivo",
+      "responsabilidade": "o que esse modulo faz",
+      "depende_de": ["lista de outros arquivos que ele importa ou usa"]
+    }}
+  ],
+  "fluxo_principal": "descreva em passos como uma requisicao flui pelo sistema do inicio ao fim",
+  "como_contribuir": "instrucoes praticas para um dev novo comecar a contribuir"
+}}"""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+
+    clean = response.choices[0].message.content.strip()
+    if clean.startswith("```"):
+        clean = clean.split("```")[1]
+        if clean.startswith("json"):
+            clean = clean[4:]
+    clean = clean.strip()
+
+    try:
+        return json.loads(clean)
+    except:
+        return {
+            "visao_geral": "Nao foi possivel gerar a arquitetura.",
+            "modulos": [],
+            "fluxo_principal": "",
+            "como_contribuir": ""
+        }
