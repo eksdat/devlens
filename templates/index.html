@@ -6,187 +6,39 @@
   <title>DevLens</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 40px 20px 20px;
-      text-align: center;
-      border-bottom: 1px solid #21262d;
-    }
-
-    header h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(90deg, #58a6ff, #a371f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    header p {
-      color: #8b949e;
-      margin-top: 8px;
-      font-size: 1rem;
-    }
-
-    .search-box {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 0 20px;
-      display: flex;
-      gap: 12px;
-    }
-
-    .search-box input {
-      flex: 1;
-      padding: 14px 18px;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      color: #e6edf3;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
+    body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+    header { padding: 40px 20px 20px; text-align: center; border-bottom: 1px solid #21262d; }
+    header h1 { font-size: 2.5rem; background: linear-gradient(90deg, #58a6ff, #a371f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { color: #8b949e; margin-top: 8px; font-size: 1rem; }
+    .search-box { max-width: 700px; margin: 40px auto; padding: 0 20px; display: flex; gap: 12px; }
+    .search-box input { flex: 1; padding: 14px 18px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; color: #e6edf3; font-size: 1rem; outline: none; transition: border-color 0.2s; }
     .search-box input:focus { border-color: #58a6ff; }
-
-    .search-box button {
-      padding: 14px 24px;
-      background: linear-gradient(90deg, #58a6ff, #a371f7);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
+    .search-box button { padding: 14px 24px; background: linear-gradient(90deg, #58a6ff, #a371f7); border: none; border-radius: 8px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
     .search-box button:hover { opacity: 0.85; }
     .search-box button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #8b949e;
-      display: none;
-    }
-
-    .loading .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #21262d;
-      border-top-color: #58a6ff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-
+    .loading { text-align: center; padding: 40px; color: #8b949e; display: none; }
+    .loading .spinner { width: 40px; height: 40px; border: 3px solid #21262d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .result {
-      max-width: 800px;
-      margin: 0 auto 60px;
-      padding: 0 20px;
-      display: none;
-    }
-
-    .repo-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 24px;
-      color: #58a6ff;
-    }
-
-    .nota-badge {
-      display: inline-block;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-left: 12px;
-    }
-
-    .card {
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 10px;
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-
-    .card h3 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #8b949e;
-      margin-bottom: 12px;
-    }
-
+    .result { max-width: 800px; margin: 0 auto 60px; padding: 0 20px; display: none; }
+    .repo-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; color: #58a6ff; }
+    .nota-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-weight: 700; font-size: 1rem; margin-left: 12px; }
+    .card { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 24px; margin-bottom: 16px; }
+    .card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #8b949e; margin-bottom: 12px; }
     .card p { color: #e6edf3; line-height: 1.6; }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 8px;
-    }
-
-    .metric-item {
-      background: #21262d;
-      border-radius: 8px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .metric-label {
-      font-size: 0.75rem;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .metric-value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #e6edf3;
-    }
-
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
+    .metric-item { background: #21262d; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .metric-label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-value { font-size: 1.1rem; font-weight: 700; color: #e6edf3; }
     .tag-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .tag {
-      background: #21262d;
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 0.9rem;
-      color: #e6edf3;
-      border-left: 3px solid #58a6ff;
-    }
-
+    .tag { background: #21262d; border-radius: 6px; padding: 10px 14px; font-size: 0.9rem; color: #e6edf3; border-left: 3px solid #58a6ff; }
     .tag.warn { border-left-color: #f85149; }
     .tag.sug { border-left-color: #3fb950; }
-
-    .error-box {
-      max-width: 700px;
-      margin: 20px auto;
-      padding: 16px 20px;
-      background: #2d1117;
-      border: 1px solid #f85149;
-      border-radius: 8px;
-      color: #f85149;
-      display: none;
-    }
+    .tag.sec { border-left-color: #f0883e; }
+    .security-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin-left: 8px; }
+    .error-box { max-width: 700px; margin: 20px auto; padding: 16px 20px; background: #2d1117; border: 1px solid #f85149; border-radius: 8px; color: #f85149; display: none; }
   </style>
 </head>
 <body>
-
   <header>
     <h1>🔍 DevLens</h1>
     <p>Analise qualquer repositório GitHub com inteligência artificial</p>
@@ -222,34 +74,41 @@
       errorBox.style.display = 'none';
 
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 120000);
+
         const response = await fetch('/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
+          body: JSON.stringify({ url }),
+          signal: controller.signal
         });
 
+        clearTimeout(timeout);
         const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.detail || 'Erro desconhecido');
-        }
+        if (!response.ok) throw new Error(data.detail || 'Erro desconhecido');
 
         const a = data.analysis;
         const nota = a.nota;
         const cor = nota >= 8 ? '#3fb950' : nota >= 6 ? '#d29922' : '#f85149';
         const m = a.metrics;
+        const miColor = m.maintainability.grade === 'A' ? '#3fb950' : m.maintainability.grade === 'B' ? '#d29922' : '#f85149';
+        const complexColor = m.complexity.risk === 'low' ? '#3fb950' : m.complexity.risk === 'medium' ? '#d29922' : '#f85149';
+        const secColor = m.security.severity === 'low' ? '#3fb950' : m.security.severity === 'medium' ? '#d29922' : '#f85149';
 
-        const miColor = m.maintainability.grade === 'A' ? '#3fb950' :
-                        m.maintainability.grade === 'B' ? '#d29922' : '#f85149';
-        const complexColor = m.complexity.risk === 'low' ? '#3fb950' :
-                             m.complexity.risk === 'medium' ? '#d29922' : '#f85149';
+        const depsHtml = m.dependencies.has_dependency_file
+          ? m.dependencies.found.map(f => `<div class="tag">📦 ${f}</div>`).join('')
+          : '<div class="tag warn">❌ Nenhum arquivo de dependência encontrado</div>';
+
+        const secIssuesHtml = m.security.total_issues === 0
+          ? '<div class="tag sug">✅ Nenhum problema de segurança detectado</div>'
+          : m.security.issues.map(i => `<div class="tag sec">⚠️ <strong>${i.file}</strong> — ${i.type} (${i.occurrences}x)</div>`).join('');
 
         result.innerHTML = `
           <div class="repo-title">
             📦 ${data.repo}
-            <span class="nota-badge" style="background:${cor}22; color:${cor}">
-              ${nota}/10
-            </span>
+            <span class="nota-badge" style="background:${cor}22; color:${cor}">${nota}/10</span>
           </div>
 
           <div class="card">
@@ -261,15 +120,11 @@
               </div>
               <div class="metric-item">
                 <span class="metric-label">Complexidade</span>
-                <span class="metric-value" style="color:${complexColor}">
-                  ${m.complexity.average} (${m.complexity.risk})
-                </span>
+                <span class="metric-value" style="color:${complexColor}">${m.complexity.average} (${m.complexity.risk})</span>
               </div>
               <div class="metric-item">
                 <span class="metric-label">Manutenibilidade</span>
-                <span class="metric-value" style="color:${miColor}">
-                  Grau ${m.maintainability.grade} (${m.maintainability.index}/100)
-                </span>
+                <span class="metric-value" style="color:${miColor}">Grau ${m.maintainability.grade} (${m.maintainability.index}/100)</span>
               </div>
               <div class="metric-item">
                 <span class="metric-label">Comentários</span>
@@ -286,6 +141,20 @@
                 <span class="metric-value">${m.documentation.has_readme ? '✅' : '❌'}</span>
               </div>
             </div>
+          </div>
+
+          <div class="card">
+            <h3>🔒 Segurança
+              <span class="security-badge" style="background:${secColor}22; color:${secColor}">
+                ${m.security.severity.toUpperCase()}
+              </span>
+            </h3>
+            <div class="tag-list">${secIssuesHtml}</div>
+          </div>
+
+          <div class="card">
+            <h3>📦 Dependências</h3>
+            <div class="tag-list">${depsHtml}</div>
           </div>
 
           <div class="card">
@@ -321,7 +190,11 @@
         result.style.display = 'block';
 
       } catch (err) {
-        errorBox.textContent = '❌ ' + err.message;
+        if (err.name === 'AbortError') {
+          errorBox.textContent = '❌ Tempo limite excedido. Tente um repositório menor.';
+        } else {
+          errorBox.textContent = '❌ ' + err.message;
+        }
         errorBox.style.display = 'block';
       } finally {
         btn.disabled = false;
@@ -333,6 +206,5 @@
       if (e.key === 'Enter') analyze();
     });
   </script>
-
 </body>
 </html>
