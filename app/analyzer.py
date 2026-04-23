@@ -6,46 +6,52 @@ from app.metrics import run_metrics
 
 load_dotenv()
 
-def get_client() -> Groq:
-    """Retorna um cliente Groq autenticado."""
+
+def get_client():
     return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def analyze_repo(repo_data: dict) -> dict:
-    """Analisa um repositório GitHub usando métricas reais + IA."""
-    client = get_client()
 
-    # Métricas reais primeiro
+def analyze_repo(repo_data: dict) -> dict:
+    client = get_client()
     metrics = run_metrics(repo_data)
 
     files_text = ""
     for file in repo_data["files"]:
         files_text += f"\n\n--- {file['path']} ---\n{file['content']}"
 
-    prompt = f"""Você é um engenheiro de software sênior fazendo code review de um repositório GitHub.
+    security_summary = "nenhum problema encontrado"
+    if metrics["security"]["total_issues"] > 0:
+        issues = [i["type"] for i in metrics["security"]["issues"]]
+        security_summary = f"{metrics['security']['total_issues']} problema(s): {', '.join(issues)}"
 
-Repositório: {repo_data['owner']}/{repo_data['repo']}
+    deps_summary = metrics["dependencies"]["found"] if metrics["dependencies"]["found"] else "nenhum arquivo de dependencia encontrado"
 
-=== MÉTRICAS REAIS DO CÓDIGO ===
-Complexidade ciclomática média: {metrics['complexity']['average']} (risco: {metrics['complexity']['risk']})
-Total de linhas de código: {metrics['raw']['total_lines_of_code']}
-Ratio de comentários: {metrics['raw']['comment_ratio']}%
-Índice de manutenibilidade: {metrics['maintainability']['index']}/100 (grau {metrics['maintainability']['grade']})
-Tem testes: {metrics['tests']['has_tests']} ({metrics['tests']['test_ratio']}% dos arquivos são testes)
+    prompt = f"""Voce e um engenheiro de software senior fazendo code review de um repositorio GitHub.
+
+Repositorio: {repo_data['owner']}/{repo_data['repo']}
+
+=== METRICAS REAIS DO CODIGO ===
+Complexidade ciclomatica media: {metrics['complexity']['average']} (risco: {metrics['complexity']['risk']})
+Total de linhas de codigo: {metrics['raw']['total_lines_of_code']}
+Ratio de comentarios: {metrics['raw']['comment_ratio']}%
+Indice de manutenibilidade: {metrics['maintainability']['index']}/100 (grau {metrics['maintainability']['grade']})
+Tem testes: {metrics['tests']['has_tests']} ({metrics['tests']['test_ratio']}% dos arquivos sao testes)
 Tem README: {metrics['documentation']['has_readme']}
-Arquivos de dependência: {metrics['dependencies']['found']}
+Arquivos de dependencia: {deps_summary}
+Seguranca: {security_summary} (severidade: {metrics['security']['severity']})
 
-=== CÓDIGO DO REPOSITÓRIO ===
+=== CODIGO DO REPOSITORIO ===
 {files_text}
 
-Com base nas métricas reais acima e no código, analise este repositório.
-Responda APENAS em JSON válido, sem texto fora do JSON:
+Com base nas metricas reais acima e no codigo, analise este repositorio.
+Responda APENAS em JSON valido, sem texto fora do JSON:
 {{
-  "proposito": "descrição clara do que o projeto faz",
-  "qualidade": "avaliação detalhada baseada nas métricas reais",
-  "pontos_cegos": ["ponto específico baseado nas métricas", "ponto 2", "ponto 3"],
+  "proposito": "descricao clara do que o projeto faz",
+  "qualidade": "avaliacao detalhada baseada nas metricas reais",
+  "pontos_cegos": ["ponto especifico baseado nas metricas", "ponto 2", "ponto 3"],
   "nota": 7,
-  "sugestoes": ["sugestão concreta e específica", "sugestão 2", "sugestão 3"],
-  "resumo_executivo": "análise honesta baseada em dados reais"
+  "sugestoes": ["sugestao concreta e especifica", "sugestao 2", "sugestao 3"],
+  "resumo_executivo": "analise honesta baseada em dados reais"
 }}"""
 
     response = client.chat.completions.create(
@@ -63,5 +69,4 @@ Responda APENAS em JSON válido, sem texto fora do JSON:
 
     analysis = json.loads(clean)
     analysis["metrics"] = metrics
-
     return analysis
